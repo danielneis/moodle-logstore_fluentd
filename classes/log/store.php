@@ -35,9 +35,8 @@ use Fluent\Autoloader,
 defined('MOODLE_INTERNAL') || die();
 
 
-class store implements \tool_log\log\writer {
+class store implements \tool_log\log\writer  {
     use \tool_log\helper\store,
-        \tool_log\helper\buffered_writer,
         \tool_log\helper\reader;
 
     /** @var string $logguests true if logging guest access */
@@ -47,6 +46,7 @@ class store implements \tool_log\log\writer {
         $this->helper_setup($manager);
         // Log everything before setting is saved for the first time.
         $this->logguests = $this->get_config('logguests', 1);
+        $this->buffersize = 0;
     }
 
     /**
@@ -63,6 +63,11 @@ class store implements \tool_log\log\writer {
         }
         return false;
     }
+    public function write(\core\event\base $event) {
+        $curl = new \curl();
+        $url = 'http://localhost:8888/fluentd.moodle/?time='.$event->timecreated;
+        $curl->post($url, 'json='.json_encode((array)$event));
+    }
 
     /**
      * Write one event to the store.
@@ -71,9 +76,8 @@ class store implements \tool_log\log\writer {
      * @return void
      */
     public function insert_event_entries($evententries) {
-        $logger = new FluentLogger('localhost', '8888');
         foreach ($evententries as $e) {
-            $logger->post("fluentd.test.follow", (array)$e);
+            $this->write($e);
         }
     }
 
@@ -122,5 +126,8 @@ class store implements \tool_log\log\writer {
         // Only enabled stpres are queried,
         // this means we can return true here unless store has some extra switch.
         return true;
+    }
+
+    public function dispose() {
     }
 }
