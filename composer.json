@@ -1,0 +1,22 @@
+{
+  "name": "danielneis/moodle-logstore_fluentd",
+  "description": "Send Moodle's events to Fluentd",
+  "keywords": [
+    "Moodle",
+    "fluentd"
+  ],
+  "homepage": "https://github.com/danielneis/moodle-logstore_fluentd",
+  "license": "GPL-3.0",
+  "authors": [
+    {
+      "name": "Daniel Neis Araujo",
+      "email": "danielneis@gmail.com"
+    }
+  ],
+  "require": {
+    "fluent/logger": "v0.3.8"
+  },
+  "autoload": {
+    "psr-0": {"Fluent": "src/"}
+  }
+}

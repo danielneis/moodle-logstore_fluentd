@@ -17,12 +17,15 @@
 /**
  * Log store lang strings.
  *
- * @package    logstore_newstore
+ * @package    logstore_fluentd
  * @copyright  2015 Daniel Neis (based on standard log store from Petr Skoda)
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 $string['buffersize'] = 'Write buffer size';
-$string['pluginname'] = 'newstore log';
+$string['pluginname'] = 'fluentd log';
 $string['pluginname_desc'] = 'A template log plugin that should do nothing.';
 $string['taskcleanup'] = 'Log table cleanup';
+$string['fluentd_url'] = 'fluentd URL';
+$string['fluentd_port'] = 'fluentd port number';
+$string['fluentd_tag'] = 'fluentd tag';

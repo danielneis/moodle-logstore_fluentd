@@ -17,7 +17,7 @@
 /**
  * Template log store tests.
  *
- * @package    logstore_newstore
+ * @package    logstore_fluentd
  * @copyright  2015 Daniel Neis (based on standard log store from Petr Skoda)
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -27,7 +27,7 @@ defined('MOODLE_INTERNAL') || die();
 require_once(__DIR__ . '/fixtures/event.php');
 require_once(__DIR__ . '/fixtures/restore_hack.php');
 
-class logstore_newstore_store_testcase extends advanced_testcase {
+class logstore_fluentd_store_testcase extends advanced_testcase {
     public function test_log_writing() {
         global $DB;
         $this->resetAfterTest();
@@ -48,31 +48,31 @@ class logstore_newstore_store_testcase extends advanced_testcase {
         $this->assertCount(0, $stores);
 
         // Enable logging plugin.
-        set_config('enabled_stores', 'logstore_newstore', 'tool_log');
-        set_config('buffersize', 0, 'logstore_newstore');
-        set_config('logguests', 1, 'logstore_newstore');
+        set_config('enabled_stores', 'logstore_fluentd', 'tool_log');
+        set_config('buffersize', 0, 'logstore_fluentd');
+        set_config('logguests', 1, 'logstore_fluentd');
         $manager = get_log_manager(true);
 
         $stores = $manager->get_readers();
         $this->assertCount(1, $stores);
-        $this->assertEquals(array('logstore_newstore'), array_keys($stores));
-        /** @var \logstore_newstore\log\store $store */
-        $store = $stores['logstore_newstore'];
-        $this->assertInstanceOf('logstore_newstore\log\store', $store);
+        $this->assertEquals(array('logstore_fluentd'), array_keys($stores));
+        /** @var \logstore_fluentd\log\store $store */
+        $store = $stores['logstore_fluentd'];
+        $this->assertInstanceOf('logstore_fluentd\log\store', $store);
         $this->assertInstanceOf('tool_log\log\writer', $store);
         $this->assertTrue($store->is_logging());
 
-        $logs = $DB->get_records('logstore_newstore_log', array(), 'id ASC');
+        $logs = $DB->get_records('logstore_fluentd_log', array(), 'id ASC');
         $this->assertCount(0, $logs);
 
         $this->setCurrentTimeStart();
 
         $this->setUser(0);
-        $event1 = \logstore_newstore\event\unittest_executed::create(
+        $event1 = \logstore_fluentd\event\unittest_executed::create(
             array('context' => context_module::instance($module1->cmid), 'other' => array('sample' => 5, 'xx' => 10)));
         $event1->trigger();
 
-        $logs = $DB->get_records('logstore_newstore_log', array(), 'id ASC');
+        $logs = $DB->get_records('logstore_fluentd_log', array(), 'id ASC');
         $this->assertCount(1, $logs);
 
         $log1 = reset($logs);
@@ -87,18 +87,18 @@ class logstore_newstore_store_testcase extends advanced_testcase {
 
         $this->setAdminUser();
         \core\session\manager::loginas($user1->id, context_system::instance());
-        $this->assertEquals(2, $DB->count_records('logstore_newstore_log'));
+        $this->assertEquals(2, $DB->count_records('logstore_fluentd_log'));
 
-        logstore_newstore_restore::hack_executing(1);
-        $event2 = \logstore_newstore\event\unittest_executed::create(
+        logstore_fluentd_restore::hack_executing(1);
+        $event2 = \logstore_fluentd\event\unittest_executed::create(
             array('context' => context_module::instance($module2->cmid), 'other' => array('sample' => 6, 'xx' => 9)));
         $event2->trigger();
-        logstore_newstore_restore::hack_executing(0);
+        logstore_fluentd_restore::hack_executing(0);
 
         \core\session\manager::init_empty_session();
         $this->assertFalse(\core\session\manager::is_loggedinas());
 
-        $logs = $DB->get_records('logstore_newstore_log', array(), 'id ASC');
+        $logs = $DB->get_records('logstore_fluentd_log', array(), 'id ASC');
         $this->assertCount(3, $logs);
         array_shift($logs);
         $log2 = array_shift($logs);
@@ -130,66 +130,66 @@ class logstore_newstore_store_testcase extends advanced_testcase {
         $this->assertEquals($event2->get_data(), $resev2->get_data());
 
         // Test buffering.
-        set_config('buffersize', 3, 'logstore_newstore');
+        set_config('buffersize', 3, 'logstore_fluentd');
         $manager = get_log_manager(true);
         $stores = $manager->get_readers();
-        /** @var \logstore_newstore\log\store $store */
-        $store = $stores['logstore_newstore'];
-        $DB->delete_records('logstore_newstore_log');
+        /** @var \logstore_fluentd\log\store $store */
+        $store = $stores['logstore_fluentd'];
+        $DB->delete_records('logstore_fluentd_log');
 
-        \logstore_newstore\event\unittest_executed::create(
+        \logstore_fluentd\event\unittest_executed::create(
             array('context' => context_module::instance($module1->cmid), 'other' => array('sample' => 5, 'xx' => 10)))->trigger();
-        $this->assertEquals(0, $DB->count_records('logstore_newstore_log'));
-        \logstore_newstore\event\unittest_executed::create(
+        $this->assertEquals(0, $DB->count_records('logstore_fluentd_log'));
+        \logstore_fluentd\event\unittest_executed::create(
             array('context' => context_module::instance($module1->cmid), 'other' => array('sample' => 5, 'xx' => 10)))->trigger();
-        $this->assertEquals(0, $DB->count_records('logstore_newstore_log'));
+        $this->assertEquals(0, $DB->count_records('logstore_fluentd_log'));
         $store->flush();
-        $this->assertEquals(2, $DB->count_records('logstore_newstore_log'));
-        \logstore_newstore\event\unittest_executed::create(
+        $this->assertEquals(2, $DB->count_records('logstore_fluentd_log'));
+        \logstore_fluentd\event\unittest_executed::create(
             array('context' => context_module::instance($module1->cmid), 'other' => array('sample' => 5, 'xx' => 10)))->trigger();
-        $this->assertEquals(2, $DB->count_records('logstore_newstore_log'));
-        \logstore_newstore\event\unittest_executed::create(
+        $this->assertEquals(2, $DB->count_records('logstore_fluentd_log'));
+        \logstore_fluentd\event\unittest_executed::create(
             array('context' => context_module::instance($module1->cmid), 'other' => array('sample' => 5, 'xx' => 10)))->trigger();
-        $this->assertEquals(2, $DB->count_records('logstore_newstore_log'));
-        \logstore_newstore\event\unittest_executed::create(
+        $this->assertEquals(2, $DB->count_records('logstore_fluentd_log'));
+        \logstore_fluentd\event\unittest_executed::create(
             array('context' => context_module::instance($module1->cmid), 'other' => array('sample' => 5, 'xx' => 10)))->trigger();
-        $this->assertEquals(5, $DB->count_records('logstore_newstore_log'));
-        \logstore_newstore\event\unittest_executed::create(
+        $this->assertEquals(5, $DB->count_records('logstore_fluentd_log'));
+        \logstore_fluentd\event\unittest_executed::create(
             array('context' => context_module::instance($module1->cmid), 'other' => array('sample' => 5, 'xx' => 10)))->trigger();
-        $this->assertEquals(5, $DB->count_records('logstore_newstore_log'));
-        \logstore_newstore\event\unittest_executed::create(
+        $this->assertEquals(5, $DB->count_records('logstore_fluentd_log'));
+        \logstore_fluentd\event\unittest_executed::create(
             array('context' => context_module::instance($module1->cmid), 'other' => array('sample' => 5, 'xx' => 10)))->trigger();
-        $this->assertEquals(5, $DB->count_records('logstore_newstore_log'));
-        \logstore_newstore\event\unittest_executed::create(
+        $this->assertEquals(5, $DB->count_records('logstore_fluentd_log'));
+        \logstore_fluentd\event\unittest_executed::create(
             array('context' => context_module::instance($module1->cmid), 'other' => array('sample' => 5, 'xx' => 10)))->trigger();
-        $this->assertEquals(8, $DB->count_records('logstore_newstore_log'));
+        $this->assertEquals(8, $DB->count_records('logstore_fluentd_log'));
 
         // Test guest logging setting.
-        set_config('logguests', 0, 'logstore_newstore');
-        set_config('buffersize', 0, 'logstore_newstore');
+        set_config('logguests', 0, 'logstore_fluentd');
+        set_config('buffersize', 0, 'logstore_fluentd');
         get_log_manager(true);
-        $DB->delete_records('logstore_newstore_log');
+        $DB->delete_records('logstore_fluentd_log');
         get_log_manager(true);
 
         $this->setUser(null);
-        \logstore_newstore\event\unittest_executed::create(
+        \logstore_fluentd\event\unittest_executed::create(
             array('context' => context_module::instance($module1->cmid), 'other' => array('sample' => 5, 'xx' => 10)))->trigger();
-        $this->assertEquals(0, $DB->count_records('logstore_newstore_log'));
+        $this->assertEquals(0, $DB->count_records('logstore_fluentd_log'));
 
         $this->setGuestUser();
-        \logstore_newstore\event\unittest_executed::create(
+        \logstore_fluentd\event\unittest_executed::create(
             array('context' => context_module::instance($module1->cmid), 'other' => array('sample' => 5, 'xx' => 10)))->trigger();
-        $this->assertEquals(0, $DB->count_records('logstore_newstore_log'));
+        $this->assertEquals(0, $DB->count_records('logstore_fluentd_log'));
 
         $this->setUser($user1);
-        \logstore_newstore\event\unittest_executed::create(
+        \logstore_fluentd\event\unittest_executed::create(
             array('context' => context_module::instance($module1->cmid), 'other' => array('sample' => 5, 'xx' => 10)))->trigger();
-        $this->assertEquals(1, $DB->count_records('logstore_newstore_log'));
+        $this->assertEquals(1, $DB->count_records('logstore_fluentd_log'));
 
         $this->setUser($user2);
-        \logstore_newstore\event\unittest_executed::create(
+        \logstore_fluentd\event\unittest_executed::create(
             array('context' => context_module::instance($module1->cmid), 'other' => array('sample' => 5, 'xx' => 10)))->trigger();
-        $this->assertEquals(2, $DB->count_records('logstore_newstore_log'));
+        $this->assertEquals(2, $DB->count_records('logstore_fluentd_log'));
 
         set_config('enabled_stores', '', 'tool_log');
         get_log_manager(true);
@@ -212,7 +212,7 @@ class logstore_newstore_store_testcase extends advanced_testcase {
 
         // Make sure all supported reports are installed.
         $expectedreports = array_keys(array_intersect_key($allreports, $supportedreports));
-        $reports = $logmanager->get_supported_reports('logstore_newstore');
+        $reports = $logmanager->get_supported_reports('logstore_fluentd');
         $reports = array_keys($reports);
         foreach ($expectedreports as $expectedreport) {
             $this->assertContains($expectedreport, $reports);
@@ -230,11 +230,11 @@ class logstore_newstore_store_testcase extends advanced_testcase {
         $this->preventResetByRollback();
         $this->setAdminUser();
 
-        set_config('enabled_stores', 'logstore_newstore', 'tool_log');
+        set_config('enabled_stores', 'logstore_fluentd', 'tool_log');
 
         $manager = get_log_manager(true);
         $stores = $manager->get_readers();
-        $store = $stores['logstore_newstore'];
+        $store = $stores['logstore_fluentd'];
 
         $events = $store->get_events_select_iterator('', array(), '', 0, 0);
         $this->assertFalse($events->valid());
@@ -277,7 +277,7 @@ class logstore_newstore_store_testcase extends advanced_testcase {
     }
 
     /**
-     * Test that the newstore log cleanup works correctly.
+     * Test that the fluentd log cleanup works correctly.
      */
     public function test_cleanup_task() {
         global $DB;
@@ -294,22 +294,22 @@ class logstore_newstore_store_testcase extends advanced_testcase {
             'userid' => 1,
             'timecreated' => time(),
         );
-        $DB->insert_record('logstore_newstore_log', $record);
+        $DB->insert_record('logstore_fluentd_log', $record);
         $record->timecreated -= 3600 * 24 * 30;
-        $DB->insert_record('logstore_newstore_log', $record);
+        $DB->insert_record('logstore_fluentd_log', $record);
         $record->timecreated -= 3600 * 24 * 30;
-        $DB->insert_record('logstore_newstore_log', $record);
+        $DB->insert_record('logstore_fluentd_log', $record);
         $record->timecreated -= 3600 * 24 * 30;
-        $DB->insert_record('logstore_newstore_log', $record);
-        $this->assertEquals(4, $DB->count_records('logstore_newstore_log'));
+        $DB->insert_record('logstore_fluentd_log', $record);
+        $this->assertEquals(4, $DB->count_records('logstore_fluentd_log'));
 
         // Remove all logs before "today".
-        set_config('loglifetime', 1, 'logstore_newstore');
+        set_config('loglifetime', 1, 'logstore_fluentd');
 
-        $this->expectOutputString(" Deleted old log records from newstore store.\n");
-        $clean = new \logstore_newstore\task\cleanup_task();
+        $this->expectOutputString(" Deleted old log records from fluentd store.\n");
+        $clean = new \logstore_fluentd\task\cleanup_task();
         $clean->execute();
 
-        $this->assertEquals(1, $DB->count_records('logstore_newstore_log'));
+        $this->assertEquals(1, $DB->count_records('logstore_fluentd_log'));
     }
 }

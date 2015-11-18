@@ -15,15 +15,17 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Template log store.
+ * Log store lang strings.
  *
  * @package    logstore_fluentd
  * @copyright  2015 Daniel Neis (based on standard log store from Petr Skoda)
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-defined('MOODLE_INTERNAL') || die();
-
-$plugin->version = 2015070700; // The current plugin version (Date: YYYYMMDDXX).
-$plugin->requires = 2015050500; // Requires this Moodle version.
-$plugin->component = 'logstore_fluentd'; // Full name of the plugin (used for diagnostics).
+$string['buffersize'] = '書き込みバッファーサイズ';
+$string['pluginname'] = 'fluentd';
+$string['pluginname_desc'] = 'Moodleログをfluentdに送信します。';
+$string['taskcleanup'] = 'ログテーブルをクリーンアップしています。';
+$string['fluentd_url'] = 'fluentd URL';
+$string['fluentd_port'] = 'fluentd ポート番号';
+$string['fluentd_tag'] = 'fluentd タグ';

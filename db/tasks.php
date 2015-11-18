@@ -17,7 +17,7 @@
 /**
  * Template log reader/writer cron task.
  *
- * @package    logstore_newstore
+ * @package    logstore_fluentd
  * @copyright  2015 Daniel Neis (based on standard log store from Petr Skoda)
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -26,7 +26,7 @@ defined('MOODLE_INTERNAL') || die();
 
 $tasks = array(
     array(
-        'classname' => '\logstore_newstore\task\cleanup_task',
+        'classname' => '\logstore_fluentd\task\cleanup_task',
         'blocking' => 0,
         'minute' => 'R',
         'hour' => '4',
