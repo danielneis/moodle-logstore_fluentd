@@ -17,20 +17,21 @@
 /**
  * Template log writer
  *
- * @package    logstore_newstore
+ * @package    logstore_fluentd
  * @copyright  2015 Daniel Neis (based on standard log store from Petr Skoda)
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 
-namespace logstore_newstore\log;
+namespace logstore_fluentd\log;
 
-require_once($CFG->dirroot.'/admin/tool/log/store/newstore/src/Fluent/Autoloader.php');
-use Fluent\Autoloader,
-    Fluent\Logger\FluentLogger;
+global $CFG;
 
-\Fluent\Autoloader::register();
+require_once($CFG->dirroot.'/admin/tool/log/store/fluentd/vendor/autoload.php');
 
+use Fluent\Autoloader;
+
+Autoloader::register();
 
 defined('MOODLE_INTERNAL') || die();
 
@@ -65,14 +66,14 @@ class store implements \tool_log\log\writer  {
     }
     public function write(\core\event\base $event) {
         $curl = new \curl();
-        $url = 'http://localhost:8888/fluentd.moodle/?time='.$event->timecreated;
+        $url = $this->get_config('fluentd_url', 'http://localhost') . ':' . $this->get_config('fluentd_port', 8888) . '/' .  $this->get_config('fluentd_tag', 'fluentd.moodle') . '/?time='.$event->timecreated;
         $curl->post($url, 'json='.json_encode((array)$event));
     }
 
     /**
      * Write one event to the store.
      *
-     * @param \core\event\base $event
+     * @param \core\event\base $evententries
      * @return void
      */
     public function insert_event_entries($evententries) {
@@ -102,7 +103,7 @@ class store implements \tool_log\log\writer  {
     /**
      * Returns an event from the log data.
      *
-     * @param stdClass $data Log data
+     * @param \stdClass $data Log data
      * @return \core\event\base
      */
     public function get_log_event($data) {
