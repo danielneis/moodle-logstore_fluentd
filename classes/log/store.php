@@ -28,8 +28,10 @@ namespace logstore_fluentd\log;
 global $CFG;
 
 require_once($CFG->dirroot.'/admin/tool/log/store/fluentd/vendor/autoload.php');
+require_once($CFG->dirroot.'/lib/filelib.php');
 
-use Fluent\Autoloader;
+use Fluent\Autoloader,
+    Fluent\Logger\FluentLogger;
 
 Autoloader::register();
 
