@@ -10,3 +10,6 @@ This plugin uses the [fluent/logger](https://packagist.org/packages/fluent/logge
 Any problems, please fill an issue at: https://github.com/danielneis/moodle-logstore_fluentd/issues
 
 Feel free to send or comment on pull requests at: https://github.com/danielneis/moodle-logstore_fluentd/pulls
+
+[![Build Status](https://travis-ci.org/danielneis/moodle-logstore_fluentd.svg?branch=master)](https://travis-ci.org/danielneis/moodle-logstore_fluentd)
+[![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/danielneis/moodle-logstore_fluentd/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/danielneis/moodle-logstore_fluentd/?branch=master)
