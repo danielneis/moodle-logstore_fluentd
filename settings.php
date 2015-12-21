@@ -64,7 +64,4 @@ if ($hassiteconfig) {
     $settings->add(new admin_setting_configtext('logstore_fluentd/fluentd_tag',
         get_string('fluentd_tag', 'logstore_fluentd'),
         '', 'fluentd.moodle', PARAM_TEXT));
-
-    $settings_a = new \admin_settingpage('logstore_fluentd', "");
-
 }

@@ -121,7 +121,8 @@ class logstore_fluentd_store_testcase extends advanced_testcase {
 
         // Test reading.
         $this->assertSame(3, $store->get_events_select_count('', array()));
-        $events = $store->get_events_select('', array(), 'timecreated ASC', 0, 0); // Is actually sorted by "timecreated ASC, id ASC".
+        // Is actually sorted by "timecreated ASC, id ASC".
+        $events = $store->get_events_select('', array(), 'timecreated ASC', 0, 0);
         $this->assertCount(3, $events);
         $resev1 = array_shift($events);
         array_shift($events);

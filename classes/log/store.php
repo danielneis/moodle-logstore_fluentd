@@ -68,7 +68,9 @@ class store implements \tool_log\log\writer  {
     }
     public function write(\core\event\base $event) {
         $curl = new \curl();
-        $url = $this->get_config('fluentd_url', 'http://localhost') . ':' . $this->get_config('fluentd_port', 8888) . '/' .  $this->get_config('fluentd_tag', 'fluentd.moodle') . '/?time='.$event->timecreated;
+        $url = $this->get_config('fluentd_url', 'http://localhost') . ':' .
+               $this->get_config('fluentd_port', 8888) . '/' .
+               $this->get_config('fluentd_tag', 'fluentd.moodle') . '/?time='.$event->timecreated;
         $curl->post($url, 'json='.json_encode((array)$event));
     }
 
