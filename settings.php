@@ -55,11 +55,11 @@ if ($hassiteconfig) {
 
     $settings->add(new admin_setting_configtext('logstore_fluentd/fluentd_url',
         get_string('fluentd_url', 'logstore_fluentd'),
-        '', 'http://localhost', PARAM_TEXT));
+        '', 'localhost', PARAM_TEXT));
 
     $settings->add(new admin_setting_configtext('logstore_fluentd/fluentd_port',
         get_string('fluentd_port', 'logstore_fluentd'),
-        '', '8888', PARAM_INT));
+        '', '24224', PARAM_INT));
 
     $settings->add(new admin_setting_configtext('logstore_fluentd/fluentd_tag',
         get_string('fluentd_tag', 'logstore_fluentd'),
