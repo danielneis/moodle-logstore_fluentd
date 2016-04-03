@@ -45,11 +45,14 @@ class store implements \tool_log\log\writer  {
     /** @var string $logguests true if logging guest access */
     protected $logguests;
 
+    private $logger;
+
     public function __construct(\tool_log\log\manager $manager) {
         $this->helper_setup($manager);
         // Log everything before setting is saved for the first time.
         $this->logguests = $this->get_config('logguests', 1);
         $this->buffersize = 0;
+        $this->logger = new FluentLogger($this->get_config('fluentd_url', 'localhost'), $this->get_config('fluentd_port', 24224));
     }
 
     /**
@@ -67,11 +70,7 @@ class store implements \tool_log\log\writer  {
         return false;
     }
     public function write(\core\event\base $event) {
-        $curl = new \curl();
-        $url = $this->get_config('fluentd_url', 'http://localhost') . ':' .
-               $this->get_config('fluentd_port', 8888) . '/' .
-               $this->get_config('fluentd_tag', 'fluentd.moodle') . '/?time='.$event->timecreated;
-        $curl->post($url, 'json='.json_encode((array)$event));
+        var_dump($this->logger->post($this->get_config('fluentd_tag', 'fluentd.moodle'), json_encode((array)$event)));
     }
 
     /**

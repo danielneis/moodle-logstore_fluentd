@@ -4,8 +4,8 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "09aff89a8f3860b1726a80859321a686",
-    "content-hash": "ff2cda12e5a7fc7e3e939b501378a3cd",
+    "hash": "c24a89d1049ac3cadbccd5d88dbf388e",
+    "content-hash": "4198285310cf5f9bba2319dc037af148",
     "packages": [
         {
             "name": "fluent/logger",
