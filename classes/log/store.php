@@ -70,7 +70,7 @@ class store implements \tool_log\log\writer  {
         return false;
     }
     public function write(\core\event\base $event) {
-        var_dump($this->logger->post($this->get_config('fluentd_tag', 'fluentd.moodle'), json_encode((array)$event)));
+        $this->logger->post($this->get_config('fluentd_tag', 'fluentd.moodle'), (array)$event);
     }
 
     /**
